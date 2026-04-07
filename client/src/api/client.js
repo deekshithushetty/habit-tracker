@@ -2,11 +2,11 @@ import axios from 'axios';
 
 // Determine API URL based on environment
 const getBaseURL = () => {
-  // In production, API is on same domain
-  if (import.meta.env.PROD) {
-    return '/api';
+  // Use environment variable if available
+  if (import.meta.env.VITE_API_URL) {
+    return `${import.meta.env.VITE_API_URL}/api`;
   }
-  // In development, use Vite proxy
+  // Fallback for development (uses Vite proxy)
   return '/api';
 };
 
@@ -17,6 +17,8 @@ const api = axios.create({
     'Content-Type': 'application/json'
   }
 });
+
+// ... rest of the file stays the same
 
 // Store for access token
 let accessToken = null;
