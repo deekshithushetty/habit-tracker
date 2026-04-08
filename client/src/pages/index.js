@@ -4,4 +4,3 @@ export { Insights } from './Insights';
 export { Profile } from './Profile';
 export { Login } from './Login';
 export { Register } from './Register';
-export { Debug } from './Debug';
