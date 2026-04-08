@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const path = require('path');
 require('dotenv').config();
 
 const errorHandler = require('./middleware/errorHandler');
@@ -12,11 +11,12 @@ const insightRoutes = require('./routes/insight.routes');
 
 const app = express();
 
-// --- CORS Configuration for Production ---
+// --- CORS Configuration for Separate Deployments ---
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
-  process.env.FRONTEND_URL
+  process.env.FRONTEND_URL,
+  'https://habit-tracker-app.onrender.com' // Your frontend Render URL
 ].filter(Boolean);
 
 app.use(cors({
@@ -24,27 +24,29 @@ app.use(cors({
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('Blocked origin:', origin);
-      callback(null, true); // Allow all in development, restrict in production if needed
+      console.log('❌ Blocked origin:', origin);
+      callback(null, false);
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Set-Cookie']
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // --- Core Middleware ---
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// --- Trust Proxy (for secure cookies behind reverse proxy) ---
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
+// --- Trust Proxy (required for cookies to work on Render) ---
+app.set('trust proxy', 1);
 
 // --- Health Check ---
 app.get('/api/health', (req, res) => {
@@ -67,17 +69,6 @@ app.use(/^\/api\/.*/, (req, res) => {
     error: { message: `Route not found: ${req.method} ${req.originalUrl}` }
   });
 });
-
-// --- Serve Frontend in Production ---
-if (process.env.NODE_ENV === 'production') {
-  const clientBuildPath = path.join(__dirname, '../client/dist');
-  
-  app.use(express.static(clientBuildPath));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
-  });
-}
 
 // --- Global Error Handler ---
 app.use(errorHandler);
