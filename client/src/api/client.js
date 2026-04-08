@@ -1,29 +1,21 @@
 import axios from 'axios';
 
-// Determine API URL based on environment
-const getBaseURL = () => {
-  // Use environment variable if available
-  if (import.meta.env.VITE_API_URL) {
-    return `${import.meta.env.VITE_API_URL}/api`;
-  }
-  // Fallback for development (uses Vite proxy)
-  return '/api';
-};
+// Production API URL - update this after backend deploys
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD 
+    ? 'https://habit-tracker-api.onrender.com/api' 
+    : '/api'
+  );
 
 const api = axios.create({
-  baseURL: getBaseURL(),
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// ... rest of the file stays the same
-
-// Store for access token
 let accessToken = null;
-
-// Queue for failed requests while refreshing
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -99,7 +91,6 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         clearAccessToken();
         
-        // Only redirect if not already on login page
         if (!window.location.pathname.includes('/login')) {
           window.location.href = '/login';
         }
