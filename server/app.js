@@ -16,7 +16,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   process.env.FRONTEND_URL,
-  'https://habit-tracker-app.onrender.com' // Your frontend Render URL
+  'https://habit-tracker-olom.onrender.com' // Your frontend Render URL
 ].filter(Boolean);
 
 app.use(cors({
