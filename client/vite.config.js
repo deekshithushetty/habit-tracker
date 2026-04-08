@@ -27,8 +27,5 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     minify: 'terser'
-  },
-  preview: {
-    port: 4173
   }
 });
