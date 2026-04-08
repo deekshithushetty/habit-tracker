@@ -7,8 +7,6 @@ import { AppLayout } from '@/components/layout';
 import { ProtectedRoute } from '@/components/auth';
 import { Home, Tasks, Insights, Profile, Login, Register } from '@/pages';
 import { PageSpinner } from '@/components/ui';
-import { InstallBanner, OfflineIndicator, UpdatePrompt } from '@/components/pwa';
-import { Debug } from '@/pages/Debug'; // Add this
 
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -27,7 +25,6 @@ const PublicRoute = ({ children }) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/debug" element={<Debug />} />
       <Route
         path="/login"
         element={
@@ -68,17 +65,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          {/* PWA Components */}
-          <OfflineIndicator />
-          <UpdatePrompt />
-          
-          {/* App Routes */}
           <AppRoutes />
-          
-          {/* Install Banner */}
-          <InstallBanner />
-          
-          {/* Toast Notifications */}
           <Toaster
             position="top-center"
             toastOptions={{
