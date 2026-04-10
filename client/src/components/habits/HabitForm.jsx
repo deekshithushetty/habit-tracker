@@ -4,6 +4,7 @@ import { EmojiPicker } from './EmojiPicker';
 import { ColorPicker } from './ColorPicker';
 import { DaySelector } from './DaySelector';
 import { CATEGORIES, FREQUENCY_TYPES } from '@/lib/constants';
+import { getTodayStr } from '@/lib/dates';
 
 export const HabitForm = ({
   initialData = null,
@@ -21,7 +22,8 @@ export const HabitForm = ({
       days: [],
       timesPerWeek: null
     },
-    reminderTime: ''
+    reminderTime: '',
+    startDate: getTodayStr()
   });
 
   const [errors, setErrors] = useState({});
@@ -39,7 +41,8 @@ export const HabitForm = ({
           days: [],
           timesPerWeek: null
         },
-        reminderTime: initialData.reminderTime || ''
+        reminderTime: initialData.reminderTime || '',
+        startDate: initialData.startDate || getTodayStr()
       });
     }
   }, [initialData]);
@@ -95,7 +98,8 @@ export const HabitForm = ({
         days: formData.frequency.type === 'specific_days' ? formData.frequency.days : [],
         timesPerWeek: formData.frequency.type === 'x_per_week' ? formData.frequency.timesPerWeek : null
       },
-      reminderTime: formData.reminderTime || null
+      reminderTime: formData.reminderTime || null,
+      startDate: formData.startDate || getTodayStr()
     };
 
     onSubmit(cleanedData);
@@ -182,6 +186,14 @@ export const HabitForm = ({
         type="time"
         value={formData.reminderTime}
         onChange={(e) => updateField('reminderTime', e.target.value)}
+      />
+
+      {/* Start Date */}
+      <Input
+        label="Start Date"
+        type="date"
+        value={formData.startDate}
+        onChange={(e) => updateField('startDate', e.target.value)}
       />
 
       {/* Buttons */}

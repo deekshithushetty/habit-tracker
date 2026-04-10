@@ -55,6 +55,11 @@ const habitSchema = new mongoose.Schema(
       default: null,
       match: [/^([01]\d|2[0-3]):([0-5]\d)$/, 'Use HH:mm format']
     },
+    startDate: {
+      type: String,
+      default: () => new Date().toISOString().slice(0, 10),
+      match: [/^\d{4}-\d{2}-\d{2}$/, 'Start date must be in YYYY-MM-DD format']
+    },
 
     // Denormalized streak data — updated on each completion toggle
     currentStreak: {
