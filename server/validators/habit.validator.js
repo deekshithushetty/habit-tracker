@@ -70,7 +70,12 @@ const createHabitSchema = z.object({
     .string()
     .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Reminder time must be in HH:mm format')
     .nullable()
-    .default(null)
+    .default(null),
+
+  startDate: z
+    .string()
+    .date('Start date must be a valid date in YYYY-MM-DD format')
+    .optional()
 });
 
 const updateHabitSchema = z.object({
@@ -135,6 +140,11 @@ const updateHabitSchema = z.object({
     .string()
     .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Reminder time must be in HH:mm format')
     .nullable()
+    .optional(),
+
+  startDate: z
+    .string()
+    .date('Start date must be a valid date in YYYY-MM-DD format')
     .optional()
 });
 

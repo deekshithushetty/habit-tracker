@@ -12,6 +12,8 @@ export const WeeklyOverview = ({
   const getDayStats = (date) => {
     const dayOfWeek = new Date(date).getDay();
     const scheduledHabits = habits?.filter((habit) => {
+      // Don't count habits that haven't started yet on that date
+      if (habit.startDate && habit.startDate > date) return false;
       if (habit.frequency.type === 'daily') return true;
       if (habit.frequency.type === 'specific_days') {
         return habit.frequency.days.includes(dayOfWeek);

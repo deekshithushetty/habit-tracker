@@ -24,6 +24,8 @@ export const Home = () => {
     if (!habits) return [];
     const dayOfWeek = new Date().getDay();
     return habits.filter((habit) => {
+      // Don't show habits that haven't started yet
+      if (habit.startDate && habit.startDate > today) return false;
       if (habit.frequency.type === 'daily') return true;
       if (habit.frequency.type === 'specific_days') {
         return habit.frequency.days.includes(dayOfWeek);
@@ -31,7 +33,7 @@ export const Home = () => {
       if (habit.frequency.type === 'x_per_week') return true;
       return false;
     });
-  }, [habits]);
+  }, [habits, today]);
 
   const todayScheduledCount = todayHabits.length;
   const completedCount = todayCompletions?.totalCompleted || 0;
