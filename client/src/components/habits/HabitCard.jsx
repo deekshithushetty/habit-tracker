@@ -119,6 +119,15 @@ export const HabitCard = ({
         <div className="text-sm text-gray-500 dark:text-gray-400">
           {habit.totalCompletions} total
         </div>
+        {habit.startDate && (
+          <>
+            <div className="text-sm text-gray-400">•</div>
+            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+              <span>📅</span>
+              <span>Started {new Date(habit.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

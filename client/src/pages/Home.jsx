@@ -26,6 +26,7 @@ export const Home = () => {
     return habits.filter((habit) => {
       // Don't show habits that haven't started yet
       if (habit.startDate && habit.startDate > today) return false;
+
       if (habit.frequency.type === 'daily') return true;
       if (habit.frequency.type === 'specific_days') {
         return habit.frequency.days.includes(dayOfWeek);

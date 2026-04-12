@@ -98,7 +98,7 @@ const updateHabit = async (req, res, next) => {
     }
 
     // Only update fields that were sent
-    const allowedFields = ['name', 'emoji', 'color', 'category', 'frequency', 'reminderTime'];
+    const allowedFields = ['name', 'emoji', 'color', 'category', 'frequency', 'reminderTime', 'startDate'];
 
     allowedFields.forEach(field => {
       if (req.body[field] !== undefined) {
