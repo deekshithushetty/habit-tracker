@@ -27,7 +27,7 @@ const allowedOrigins = [
   ...configuredOrigins
 ].filter(Boolean);
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
@@ -42,11 +42,14 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Set-Cookie']
-}));
+  exposedHeaders: ['Set-Cookie'],
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 
 // Handle preflight requests
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
 // --- Core Middleware ---
 app.use(express.json({ limit: '10mb' }));
