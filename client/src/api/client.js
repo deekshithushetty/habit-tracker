@@ -1,11 +1,19 @@
 import axios from 'axios';
 
-// Production API URL - update this after backend deploys
-const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD 
-    ? 'https://habit-tracker-api.onrender.com/api' 
-    : '/api'
-  );
+const resolveApiBaseUrl = () => {
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
+
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (!apiUrl) {
+    throw new Error('VITE_API_URL is required in production.');
+  }
+
+  return apiUrl;
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -20,7 +28,7 @@ let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-  failedQueue.forEach(promise => {
+  failedQueue.forEach((promise) => {
     if (error) {
       promise.reject(error);
     } else {
@@ -40,7 +48,6 @@ export const clearAccessToken = () => {
   accessToken = null;
 };
 
-// Request interceptor
 api.interceptors.request.use(
   (config) => {
     if (accessToken) {
@@ -51,7 +58,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -90,7 +96,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         clearAccessToken();
-        
+
         if (!window.location.pathname.includes('/login')) {
           window.location.href = '/login';
         }

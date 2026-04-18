@@ -1,36 +1,49 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authApi } from '@/api';
-import { setAccessToken, clearAccessToken } from '@/api/client';
+import { clearAccessToken } from '@/api/client';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Try to restore session on mount
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        // Try to refresh the token using httpOnly cookie
-        const refreshResponse = await authApi.refresh();
-        setAccessToken(refreshResponse.accessToken);
+    let isMounted = true;
 
-        // Get user data
+    const initAuth = async () => {
+      setIsLoading(true);
+      let nextUser = null;
+      let nextIsAuthenticated = false;
+
+      try {
+        await authApi.refresh();
+        if (!isMounted) return;
+
         const meResponse = await authApi.getMe();
-        setUser(meResponse.user);
-        setIsAuthenticated(true);
-      } catch (error) {
-        // No valid session — that's fine
-        setUser(null);
-        setIsAuthenticated(false);
+        if (!isMounted) return;
+
+        nextUser = meResponse.user;
+        nextIsAuthenticated = true;
+      } catch {
+        clearAccessToken();
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setUser(nextUser);
+          setIsAuthenticated(nextIsAuthenticated);
+          setIsLoading(false);
+          setHasInitialized(true);
+        }
       }
     };
 
     initAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = useCallback(async (email, password) => {
@@ -64,6 +77,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     isLoading,
+    hasInitialized,
     isAuthenticated,
     login,
     register,

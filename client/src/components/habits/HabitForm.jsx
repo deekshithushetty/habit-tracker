@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Input, Select, Button } from '@/components/ui';
 import { EmojiPicker } from './EmojiPicker';
 import { ColorPicker } from './ColorPicker';
@@ -6,50 +6,32 @@ import { DaySelector } from './DaySelector';
 import { CATEGORIES, FREQUENCY_TYPES } from '@/lib/constants';
 import { getTodayStr } from '@/lib/dates';
 
+const getInitialFormData = (initialData = null) => ({
+  name: initialData?.name || '',
+  emoji: initialData?.emoji || '✅',
+  color: initialData?.color || '#6366f1',
+  category: initialData?.category || 'custom',
+  frequency: initialData?.frequency || {
+    type: 'daily',
+    days: [],
+    timesPerWeek: null
+  },
+  reminderTime: initialData?.reminderTime || '',
+  startDate: initialData?.startDate || getTodayStr()
+});
+
 export const HabitForm = ({
   initialData = null,
   onSubmit,
   onCancel,
   isLoading = false
 }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    emoji: '✅',
-    color: '#6366f1',
-    category: 'custom',
-    frequency: {
-      type: 'daily',
-      days: [],
-      timesPerWeek: null
-    },
-    reminderTime: '',
-    startDate: getTodayStr()
-  });
-
+  const [formData, setFormData] = useState(() => getInitialFormData(initialData));
   const [errors, setErrors] = useState({});
-
-  // Load initial data for editing
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        name: initialData.name || '',
-        emoji: initialData.emoji || '✅',
-        color: initialData.color || '#6366f1',
-        category: initialData.category || 'custom',
-        frequency: initialData.frequency || {
-          type: 'daily',
-          days: [],
-          timesPerWeek: null
-        },
-        reminderTime: initialData.reminderTime || '',
-        startDate: initialData.startDate || getTodayStr()
-      });
-    }
-  }, [initialData]);
 
   const updateField = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error for this field
+
     if (errors[field]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -90,7 +72,6 @@ export const HabitForm = ({
 
     if (!validate()) return;
 
-    // Clean up frequency data based on type
     const cleanedData = {
       ...formData,
       frequency: {
@@ -107,7 +88,6 @@ export const HabitForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Name */}
       <Input
         label="Habit Name"
         placeholder="e.g., Morning meditation"
@@ -117,19 +97,16 @@ export const HabitForm = ({
         maxLength={100}
       />
 
-      {/* Emoji */}
       <EmojiPicker
         selected={formData.emoji}
         onSelect={(emoji) => updateField('emoji', emoji)}
       />
 
-      {/* Color */}
       <ColorPicker
         selected={formData.color}
         onSelect={(color) => updateField('color', color)}
       />
 
-      {/* Category */}
       <Select
         label="Category"
         value={formData.category}
@@ -140,20 +117,17 @@ export const HabitForm = ({
         }))}
       />
 
-      {/* Frequency Type */}
       <Select
         label="Frequency"
         value={formData.frequency.type}
         onChange={(e) => {
           updateFrequency('type', e.target.value);
-          // Reset frequency-specific fields
           updateFrequency('days', []);
           updateFrequency('timesPerWeek', null);
         }}
         options={FREQUENCY_TYPES}
       />
 
-      {/* Specific Days Selector */}
       {formData.frequency.type === 'specific_days' && (
         <div>
           <DaySelector
@@ -166,7 +140,6 @@ export const HabitForm = ({
         </div>
       )}
 
-      {/* Times Per Week */}
       {formData.frequency.type === 'x_per_week' && (
         <Input
           label="Times per week"
@@ -175,12 +148,11 @@ export const HabitForm = ({
           max="7"
           placeholder="3"
           value={formData.frequency.timesPerWeek || ''}
-          onChange={(e) => updateFrequency('timesPerWeek', parseInt(e.target.value) || null)}
+          onChange={(e) => updateFrequency('timesPerWeek', parseInt(e.target.value, 10) || null)}
           error={errors.timesPerWeek}
         />
       )}
 
-      {/* Reminder Time (optional) */}
       <Input
         label="Reminder Time (optional)"
         type="time"
@@ -188,7 +160,6 @@ export const HabitForm = ({
         onChange={(e) => updateField('reminderTime', e.target.value)}
       />
 
-      {/* Start Date */}
       <Input
         label="Start Date"
         type="date"
@@ -196,7 +167,6 @@ export const HabitForm = ({
         onChange={(e) => updateField('startDate', e.target.value)}
       />
 
-      {/* Buttons */}
       <div className="flex gap-3 pt-2">
         <Button
           type="button"

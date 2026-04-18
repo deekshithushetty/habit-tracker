@@ -1,0 +1,17 @@
+services:
+  - name: habit-tracker-api
+    type: web
+    runtime: node
+    plan: starter
+    region: oregon
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

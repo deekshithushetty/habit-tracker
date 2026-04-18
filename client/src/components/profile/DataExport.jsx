@@ -6,6 +6,11 @@ import { Download, FileJson, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import { format as formatDate, subDays } from 'date-fns';
 
+const escapeCsvCell = (value) => {
+  const stringValue = String(value ?? '');
+  return `"${stringValue.replace(/"/g, '""')}"`;
+};
+
 export const DataExport = () => {
   const [exporting, setExporting] = useState(false);
   const { data: habits } = useHabits();
@@ -46,7 +51,7 @@ export const DataExport = () => {
           });
         });
 
-        content = rows.map(row => row.join(',')).join('\n');
+        content = rows.map(row => row.map(escapeCsvCell).join(',')).join('\n');
         filename = `habit-tracker-export-${today}.csv`;
         mimeType = 'text/csv';
       }
@@ -63,7 +68,7 @@ export const DataExport = () => {
       URL.revokeObjectURL(url);
 
       toast.success(`Data exported as ${fileFormat.toUpperCase()}`);
-    } catch (error) {
+    } catch {
       toast.error('Failed to export data');
     } finally {
       setExporting(false);

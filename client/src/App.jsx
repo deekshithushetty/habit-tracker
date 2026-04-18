@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
@@ -5,15 +6,17 @@ import { queryClient } from '@/lib/queryClient';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { AppLayout } from '@/components/layout';
 import { ProtectedRoute } from '@/components/auth';
-import { Home, Tasks, Insights, Profile, Login, Register } from '@/pages';
 import { PageSpinner } from '@/components/ui';
 
-const PublicRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+const Home = lazy(() => import('@/pages/Home').then((module) => ({ default: module.Home })));
+const Tasks = lazy(() => import('@/pages/Tasks').then((module) => ({ default: module.Tasks })));
+const Insights = lazy(() => import('@/pages/Insights').then((module) => ({ default: module.Insights })));
+const Profile = lazy(() => import('@/pages/Profile').then((module) => ({ default: module.Profile })));
+const Login = lazy(() => import('@/pages/Login').then((module) => ({ default: module.Login })));
+const Register = lazy(() => import('@/pages/Register').then((module) => ({ default: module.Register })));
 
-  if (isLoading) {
-    return <PageSpinner />;
-  }
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
@@ -24,39 +27,41 @@ const PublicRoute = ({ children }) => {
 
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        }
-      />
+    <Suspense fallback={<PageSpinner />}>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
 
-      <Route
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Home />} />
-        <Route path="tasks" element={<Tasks />} />
-        <Route path="insights" element={<Insights />} />
-        <Route path="profile" element={<Profile />} />
-      </Route>
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Home />} />
+          <Route path="tasks" element={<Tasks />} />
+          <Route path="insights" element={<Insights />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 };
 

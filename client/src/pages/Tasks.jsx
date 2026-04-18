@@ -102,7 +102,6 @@ export const Tasks = () => {
     return <PageSpinner />;
   }
 
-  const totalHabits = habits?.length || 0;
   const activeHabits = habits?.filter(h => !h.isArchived).length || 0;
   const archivedHabits = habits?.filter(h => h.isArchived).length || 0;
 
@@ -255,6 +254,7 @@ export const Tasks = () => {
         title="Edit Habit"
       >
         <HabitForm
+          key={editingHabit?._id || 'editing-habit'}
           initialData={editingHabit}
           onSubmit={handleUpdate}
           onCancel={() => setEditingHabit(null)}

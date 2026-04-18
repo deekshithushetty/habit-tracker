@@ -11,12 +11,20 @@ const insightRoutes = require('./routes/insight.routes');
 
 const app = express();
 
+const configuredOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URLS
+]
+  .filter(Boolean)
+  .flatMap((value) => value.split(','))
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 // --- CORS Configuration for Separate Deployments ---
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
-  process.env.FRONTEND_URL,
-  'https://habit-tracker-olom.onrender.com' // Your frontend Render URL
+  ...configuredOrigins
 ].filter(Boolean);
 
 app.use(cors({

@@ -10,6 +10,24 @@ import {
 } from 'recharts';
 import { format, parseISO } from 'date-fns';
 
+const DailyTrendTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-3 py-2 border border-gray-200 dark:border-gray-700">
+        <p className="text-sm font-medium text-gray-900 dark:text-white">
+          {format(parseISO(data.date), 'EEEE, MMM d')}
+        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {data.completed}/{data.scheduled} completed ({data.percentage}%)
+        </p>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 export const DailyTrendChart = ({
   data,
   isLoading,
@@ -50,23 +68,6 @@ export const DailyTrendChart = ({
           : '#e5e7eb' // gray
   }));
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg px-3 py-2 border border-gray-200 dark:border-gray-700">
-          <p className="text-sm font-medium text-gray-900 dark:text-white">
-            {format(parseISO(data.date), 'EEEE, MMM d')}
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {data.completed}/{data.scheduled} completed ({data.percentage}%)
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <Card>
       <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
@@ -90,7 +91,7 @@ export const DailyTrendChart = ({
               ticks={[0, 50, 100]}
               tickFormatter={(value) => `${value}%`}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
+            <Tooltip content={<DailyTrendTooltip />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
             <Bar
               dataKey="percentage"
               radius={[4, 4, 0, 0]}

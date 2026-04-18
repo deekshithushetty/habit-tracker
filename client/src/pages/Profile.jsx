@@ -12,6 +12,8 @@ import { Mail, Calendar } from 'lucide-react';
 
 export const Profile = () => {
   const { user } = useAuth();
+  const userName = user?.name?.trim() || 'User';
+  const avatarInitial = userName.charAt(0).toUpperCase() || 'U';
 
   const memberSince = user?.createdAt
     ? format(new Date(user.createdAt), 'MMMM yyyy')
@@ -32,12 +34,12 @@ export const Profile = () => {
         <div className="flex items-center gap-4">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center flex-shrink-0">
             <span className="text-3xl font-bold text-white">
-              {user?.name?.charAt(0).toUpperCase()}
+              {avatarInitial}
             </span>
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white truncate">
-              {user?.name}
+              {userName}
             </h2>
             <div className="flex items-center gap-1.5 mt-1 text-gray-500 dark:text-gray-400">
               <Mail size={14} />
